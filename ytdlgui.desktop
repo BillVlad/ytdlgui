@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Path=/home/billvlad/Downloads/Youtube-DL
+Exec=/opt/ytdlgui/ytdlgui
+Name=Youtube-Dl GUI
+Icon=/opt/ytdlgui/ytdlgui.png
+Categories=Utility
