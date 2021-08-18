@@ -3,7 +3,7 @@ from gui import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
-import pathlib, sys, os, youtube_dl, requests, mpv, locale
+import pathlib, sys, os, youtube_dl, requests, mpv, locale, webbrowser
 
 app = QtWidgets.QApplication(sys.argv)
 locale.setlocale(locale.LC_NUMERIC, 'C')
@@ -47,6 +47,7 @@ def main():
 
     def my_hook(d):
         # print(d)
+        global text
         text = d['filename']
         if d['status'] == 'finished':
             # GUI
@@ -89,9 +90,10 @@ def main():
 
         # verifyURL()
         thumbYT = ytdll.extract_info(fromurl, download=False)
-        ui.outputLabel.setText("Description")
+        ui.outputLabel.setText(f"Description (open file <a href={os.path.abspath(text)}>here</a>)")
+        ui.outputLabel.setOpenExternalLinks(True)
         if 'description' in thumbYT:
-            ui.descLabel.setText(thumbYT['description'])
+            ui.descLabel.setText("{thumbYT['description']}")
         else:
             ui.descLabel.setText("None description")
             print('No')
@@ -146,12 +148,12 @@ def main():
             ydl_video_opts = {
                 'format': 'best',
                 'videoformat': "mp4",
+                'outtmpl': '%(id)s.%(ext)s',
                 'logger': MyLogger(),
                 'progress_hooks': [my_hook]
             }
             print("Video Started")
             youtube_dl.YoutubeDL(ydl_video_opts).download([fromurl])
-            print(filename)
         else:
             ydl_audio_opts = {
                 'format': 'bestaudio/best',
@@ -161,8 +163,6 @@ def main():
             print("Audio Started")
             youtube_dl.YoutubeDL(ydl_audio_opts).download([fromurl])
         getVideoInfo()
-        print("{0}.{1}x{2}.{3}.{4}".format(
-            (thumbYT['title']) + '-' + (thumbYT['id']), (thumbYT['ext'])))
 
     # Воспроизведение медиа контента (встроенный, так сказать, MPV)
     # ПРИМЕЧАНИЕ: нужно иметь в директории или mpv.py, или установить библиотеку
@@ -184,6 +184,12 @@ def main():
         player.fullscreen = True
         player.play(fromurl)
         player.wait_until_playing()
+
+
+    def openFile():
+        fromurl = ui.lineEdit.text()
+
+        webbrowser.open(fromurl)
 
     # Вешаем события на кнопки
     ui.downButt.clicked.connect(ytdlDownload)

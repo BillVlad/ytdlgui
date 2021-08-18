@@ -1,2 +1,2 @@
 #!/bin/sh
-python /opt/ytdlgui/main.py
+python3 /opt/ytdlgui/main.py
